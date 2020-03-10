@@ -2,7 +2,7 @@
 name = "Charge from Winona's G.E.M.erator"
 description = "WX-78 can got charged by touching the Winona's G.E.M.erator."
 author = "辣椒小皇纸"
-version = "1.0.1"
+version = "1.0.2"
 forumthread = ""
 api_version = 10
 

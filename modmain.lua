@@ -5,6 +5,10 @@ end
 local fuel_rate = 2878.599999 / GetModConfigData("fuel_rate") --总燃料2878.599999
 
 local function OnStartChanneling(inst, channeler)
+    if not inst.components.fueled then
+        inst.components.channelable:StopChanneling()
+        return inst
+    end
     if not inst.components.fueled.consuming then
         inst.components.channelable:StopChanneling()
         return inst
@@ -15,11 +19,7 @@ local function OnStartChanneling(inst, channeler)
         inst.channeler.components.playerlightningtarget:DoStrike()
         inst.channeler.strike_task = inst.channeler:DoPeriodicTask(1,function(inst2)
             inst2.components.playerlightningtarget:DoStrike()
-            if inst and inst.components and inst.components.fueled and inst.components.fueled.rate then
-                if inst.components.fueled.rate < fuel_rate then
-                    inst.components.channelable:StopChanneling()
-                end
-            else
+            if inst.components.fueled.rate < fuel_rate then
                 inst.components.channelable:StopChanneling()
             end
         end)
@@ -27,7 +27,7 @@ local function OnStartChanneling(inst, channeler)
 end
 
 local function OnStopChanneling(inst, aborted)
-    if inst.components.fueled.rate >= fuel_rate then
+    if inst.components.fueled and inst.components.fueled.rate >= fuel_rate then
         inst.components.fueled.rate = inst.components.fueled.rate - fuel_rate
     end
     if inst.channeler ~= nil and inst.channeler:IsValid() and inst.channeler.components.sanity ~= nil then
@@ -47,8 +47,10 @@ end
 local function AddFunc(inst)
     inst:AddComponent("channelable")
     inst.components.channelable:SetChannelingFn(OnStartChanneling, OnStopChanneling)
-    _depleted = inst.components.fueled.depleted
-    inst.components.fueled.depleted = DepletedFunc
+    if inst.components.fueled then
+        _depleted = inst.components.fueled.depleted
+        inst.components.fueled.depleted = DepletedFunc
+    end
 end
 
 AddPrefabPostInit("winona_battery_high", AddFunc)
