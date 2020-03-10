@@ -15,7 +15,11 @@ local function OnStartChanneling(inst, channeler)
         inst.channeler.components.playerlightningtarget:DoStrike()
         inst.channeler.strike_task = inst.channeler:DoPeriodicTask(1,function(inst2)
             inst2.components.playerlightningtarget:DoStrike()
-            if inst.components.fueled.rate < fuel_rate then
+            if inst and inst.components and inst.components.fueled and inst.components.fueled.rate then
+                if inst.components.fueled.rate < fuel_rate then
+                    inst.components.channelable:StopChanneling()
+                end
+            else
                 inst.components.channelable:StopChanneling()
             end
         end)
